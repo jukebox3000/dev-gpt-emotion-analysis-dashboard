@@ -1,0 +1,180 @@
+{
+  "overview": {
+    "total_turns": 1804,
+    "total_conversations": 164,
+    "developer_turns": 902,
+    "gpt_turns": 902,
+    "unique_authors": 124,
+    "unique_repos": 123
+  },
+  "emotion_distribution": {
+    "overall": {
+      "Engagement": 391,
+      "Confusion": 314,
+      "Neutral": 871,
+      "Satisfaction": 165,
+      "Frustration": 63
+    },
+    "developer": {
+      "Engagement": 55,
+      "Confusion": 314,
+      "Neutral": 422,
+      "Satisfaction": 48,
+      "Frustration": 63
+    },
+    "gpt": {
+      "Engagement": 336,
+      "Neutral": 449,
+      "Satisfaction": 117
+    },
+    "raw_labels": {
+      "excitement": 124,
+      "confusion": 489,
+      "neutral": 871,
+      "approval": 137,
+      "gratitude": 28,
+      "annoyance": 155
+    }
+  },
+  "intent_distribution": {
+    "other": 447,
+    "debugging": 160,
+    "command": 32,
+    "question": 222,
+    "code_request": 41
+  },
+  "complexity_distribution": {
+    "High": 208,
+    "Medium": 509,
+    "Low": 185
+  },
+  "language_distribution": {
+    "Jupyter Notebook": 30,
+    "Vue": 10,
+    "Java": 362,
+    "TypeScript": 124,
+    "JavaScript": 102,
+    "TSQL": 6,
+    "Python": 392,
+    "SCSS": 4,
+    "Shell": 40,
+    "HTML": 22,
+    "C#": 8,
+    "PHP": 592,
+    "Ruby": 4,
+    "C": 8,
+    "Go": 76,
+    "C++": 2,
+    "Solidity": 8,
+    "Dockerfile": 2
+  },
+  "state_distribution": {
+    "OPEN": 74,
+    "MERGED": 1460,
+    "CLOSED": 270
+  },
+  "code_stats": {
+    "turns_with_code": 1070,
+    "percentage_with_code": 59.3
+  },
+  "question_stats": {
+    "developer_questions": 243,
+    "question_percentage": 26.9
+  },
+  "word_count_stats": {
+    "developer": {
+      "mean": 103.5,
+      "median": 18.0,
+      "min": 1,
+      "max": 3249,
+      "std": 267.0
+    },
+    "gpt": {
+      "mean": 144.8,
+      "median": 126.0,
+      "min": 1,
+      "max": 1022,
+      "std": 118.2
+    }
+  },
+  "sentiment_stats": {
+    "developer": {
+      "mean": 0.0326,
+      "median": 0.0,
+      "positive_pct": 26.7,
+      "negative_pct": 9.9,
+      "neutral_pct": 63.4
+    },
+    "gpt": {
+      "mean": 0.0545,
+      "median": 0.0,
+      "positive_pct": 46.0,
+      "negative_pct": 11.9,
+      "neutral_pct": 42.1
+    }
+  },
+  "conversation_length_stats": {
+    "mean_prompts": 4.8,
+    "median_prompts": 2.0,
+    "min_prompts": 1,
+    "max_prompts": 167,
+    "total_turns_per_conversation": {
+      "mean": 11.0,
+      "median": 4.0
+    }
+  },
+  "top_authors": {
+    "Okuro3499": 356,
+    "KayvanShah1": 334,
+    "hoshotakamoto": 134,
+    "simonw": 70,
+    "MichaelSnowden": 60,
+    "mkrupczak3": 56,
+    "HinanoOno": 52,
+    "dantebarbieri": 40,
+    "AaronGoldsmith": 28,
+    "AdamGoyer": 24,
+    "HiimKwak": 22,
+    "n-koga96": 20,
+    "ikawrakow": 20,
+    "dmichaels-harvard": 20,
+    "pimvernooij": 18,
+    "Stivaros": 16,
+    "kirilllzaitsev": 16,
+    "josecelano": 16,
+    "Hsinny": 14,
+    "AGnias47": 14
+  },
+  "top_repos": {
+    "open-learning-exchange/myplanet": 356,
+    "Email-Generation/email_generation": 334,
+    "hoshotakamoto/banzukesurfing": 134,
+    "simonw/llm": 70,
+    "Theta-Limited/OpenAthenaAndroid": 56,
+    "HinanoOno/template-ph3-website": 52,
+    "temporalio/temporal": 44,
+    "dantebarbieri/pi-picture-frame": 40,
+    "openai/evals": 28,
+    "labdao/plex": 24,
+    "QRTaxi/QRTaxi_Web": 22,
+    "n-koga96/practice-React-example-1": 20,
+    "GaloyMoney/galoy-mobile": 20,
+    "ggerganov/llama.cpp": 20,
+    "4dn-dcic/foursight-core": 20,
+    "labd/terraform-provider-storyblok": 18,
+    "Stivaros/blog": 16,
+    "SchemaStore/schemastore": 16,
+    "roboflow/supervision": 16,
+    "torrust/torrust-index-frontend": 16
+  },
+  "token_stats": {
+    "tokens_prompt": {
+      "total": 11901144,
+      "mean": 6597.1
+    },
+    "tokens_answer": {
+      "total": 23088498,
+      "mean": 12798.5
+    }
+  }
+}
