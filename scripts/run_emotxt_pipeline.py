@@ -6,8 +6,8 @@ from transformers import pipeline
 
 # Set paths
 BASE_DIR = "/Users/jithinmichael/Coding/vis-thesis"
-PROCESSED_CONVS_PATH = os.path.join(BASE_DIR, "d3js-dashboard/public/data/processed_conversations.json")
-OUTPUT_DIR = os.path.join(BASE_DIR, "d3js-dashboard/public/data/emotxt")
+PROCESSED_CONVS_PATH = os.path.join(BASE_DIR, "nextjs-emotion-dashboard/public/data/processed_conversations.json")
+OUTPUT_DIR = os.path.join(BASE_DIR, "nextjs-emotion-dashboard/public/data/emotxt")
 
 def main():
     print("--- Starting Pure Python GoEmotions Classifier Pipeline ---")
