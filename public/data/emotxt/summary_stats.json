@@ -1,0 +1,43 @@
+{
+  "overview": {
+    "total_turns": 1804,
+    "total_conversations": 164,
+    "developer_turns": 902,
+    "gpt_turns": 902,
+    "unique_authors": 124,
+    "unique_repos": 123
+  },
+  "emotion_distribution": {
+    "overall": {
+      "Surprise": 261,
+      "Joy": 2,
+      "Neutral": 1174,
+      "Love": 262,
+      "Sadness": 66,
+      "Anger": 39
+    },
+    "developer": {
+      "Surprise": 252,
+      "Joy": 1,
+      "Neutral": 568,
+      "Love": 53,
+      "Anger": 27,
+      "Sadness": 1
+    },
+    "gpt": {
+      "Surprise": 9,
+      "Neutral": 606,
+      "Love": 209,
+      "Sadness": 65,
+      "Anger": 12,
+      "Joy": 1
+    },
+    "raw_labels": {
+      "surprise": 267,
+      "love": 305,
+      "joy": 7,
+      "sadness": 73,
+      "anger": 39
+    }
+  }
+}

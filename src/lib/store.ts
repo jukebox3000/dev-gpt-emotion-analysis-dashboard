@@ -34,7 +34,7 @@ interface DashboardState {
   resetFilters: () => void;
 }
 
-const ALL_EMOTIONS: EmotionType[] = ["Frustration", "Confusion", "Satisfaction", "Engagement", "Negativity", "Neutral"];
+const ALL_EMOTIONS: EmotionType[] = ["Frustration", "Confusion", "Satisfaction", "Engagement", "Neutral"];
 const ALL_SPEAKERS: SpeakerType[] = ["Developer", "GPT"];
 const ALL_COMPLEXITIES: ComplexityType[] = ["Low", "Medium", "High"];
 const ALL_INTENTS: IntentType[] = ["question", "command", "clarification", "code_request", "debugging", "other"];
@@ -52,6 +52,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   toggleEmotion: (emotion) =>
     set((state) => {
+      const allSelected = state.selectedEmotions.length === ALL_EMOTIONS.length;
+      if (allSelected) {
+        return { selectedEmotions: [emotion] };
+      }
       const isSelected = state.selectedEmotions.includes(emotion);
       const newEmotions = isSelected
         ? state.selectedEmotions.filter((e) => e !== emotion)
@@ -61,6 +65,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   toggleSpeaker: (speaker) =>
     set((state) => {
+      const allSelected = state.selectedSpeakers.length === ALL_SPEAKERS.length;
+      if (allSelected) {
+        return { selectedSpeakers: [speaker] };
+      }
       const isSelected = state.selectedSpeakers.includes(speaker);
       const newSpeakers = isSelected
         ? state.selectedSpeakers.filter((s) => s !== speaker)
@@ -70,6 +78,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   toggleComplexity: (complexity) =>
     set((state) => {
+      const allSelected = state.selectedComplexities.length === ALL_COMPLEXITIES.length;
+      if (allSelected) {
+        return { selectedComplexities: [complexity] };
+      }
       const isSelected = state.selectedComplexities.includes(complexity);
       const newComplexities = isSelected
         ? state.selectedComplexities.filter((c) => c !== complexity)
@@ -79,6 +91,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   toggleIntent: (intent) =>
     set((state) => {
+      const allSelected = state.selectedIntents.length === ALL_INTENTS.length;
+      if (allSelected) {
+        return { selectedIntents: [intent] };
+      }
       const isSelected = state.selectedIntents.includes(intent);
       const newIntents = isSelected
         ? state.selectedIntents.filter((i) => i !== intent)

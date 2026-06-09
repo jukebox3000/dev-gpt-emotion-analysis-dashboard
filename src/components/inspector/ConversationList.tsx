@@ -93,11 +93,11 @@ export default function ConversationList({ groups, selectedId, onSelect, searchQ
   };
 
   return (
-    <div className="rounded-xl border border-[#2a2d3a] bg-[#1a1d27] overflow-hidden">
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02),0_10px_20px_rgba(0,0,0,0.015)]">
       <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-[#1a1d27] z-10">
-            <tr className="border-b border-[#2a2d3a]">
+          <thead className="sticky top-0 bg-slate-50 z-10 border-b border-slate-200">
+            <tr className="border-b border-slate-200">
               {[
                 { field: 'title' as const, label: 'Title' },
                 { field: 'author' as const, label: 'Author' },
@@ -107,14 +107,14 @@ export default function ConversationList({ groups, selectedId, onSelect, searchQ
               ].map(({ field, label }) => (
                 <th
                   key={field}
-                  className="text-left px-3 py-2 text-[#94a3b8] text-xs font-medium cursor-pointer hover:text-[#e2e8f0] transition-colors"
+                  className="text-left px-3 py-2.5 text-slate-500 text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:text-slate-800 transition-colors"
                   onClick={() => toggleSort(field)}
                 >
                   {label}
                   {sortField === field && (sortDir === 'asc' ? ' ↑' : ' ↓')}
                 </th>
               ))}
-              <th className="text-left px-3 py-2 text-[#94a3b8] text-xs font-medium">Conf.</th>
+              <th className="text-left px-3 py-2.5 text-slate-500 text-[10px] font-bold uppercase tracking-wider">Conf.</th>
             </tr>
           </thead>
           <tbody>
@@ -127,19 +127,19 @@ export default function ConversationList({ groups, selectedId, onSelect, searchQ
               return (
                 <tr
                   key={g.conversation_id}
-                  className={`border-b border-[#2a2d3a] cursor-pointer transition-colors ${
-                    isSelected ? 'bg-[#1e2a3a]' : 'hover:bg-[#1f2230]'
+                  className={`border-b border-slate-100 cursor-pointer transition-all duration-200 ${
+                    isSelected ? 'bg-indigo-50/60 border-l-2 border-l-indigo-500' : 'hover:bg-slate-50/50'
                   }`}
                   onClick={() => onSelect(g.conversation_id)}
                 >
-                  <td className="px-3 py-2 text-[#e2e8f0] max-w-[180px] truncate">{g.sharing_title}</td>
-                  <td className="px-3 py-2 text-[#94a3b8]">{g.source_author}</td>
-                  <td className="px-3 py-2 text-[#94a3b8]">{g.num_turns}</td>
+                  <td className="px-3 py-2 text-slate-800 font-semibold max-w-[180px] truncate">{g.sharing_title}</td>
+                  <td className="px-3 py-2 text-slate-500 font-medium">{g.source_author}</td>
+                  <td className="px-3 py-2 text-slate-500 font-medium">{g.num_turns}</td>
                   <td className="px-3 py-2">
                     <span
-                      className="text-xs px-1.5 py-0.5 rounded"
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-md"
                       style={{
-                        backgroundColor: `${EMOTION_COLORS_DEV[devEmotion as keyof typeof EMOTION_COLORS_DEV] || '#6b7280'}20`,
+                        backgroundColor: `${EMOTION_COLORS_DEV[devEmotion as keyof typeof EMOTION_COLORS_DEV] || '#6b7280'}15`,
                         color: EMOTION_COLORS_DEV[devEmotion as keyof typeof EMOTION_COLORS_DEV] || '#6b7280',
                       }}
                     >
@@ -148,16 +148,16 @@ export default function ConversationList({ groups, selectedId, onSelect, searchQ
                   </td>
                   <td className="px-3 py-2">
                     <span
-                      className="text-xs px-1.5 py-0.5 rounded"
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-md"
                       style={{
-                        backgroundColor: `${EMOTION_COLORS_GPT[gptEmotion as keyof typeof EMOTION_COLORS_GPT] || '#6b7280'}20`,
+                        backgroundColor: `${EMOTION_COLORS_GPT[gptEmotion as keyof typeof EMOTION_COLORS_GPT] || '#6b7280'}15`,
                         color: EMOTION_COLORS_GPT[gptEmotion as keyof typeof EMOTION_COLORS_GPT] || '#6b7280',
                       }}
                     >
                       {gptEmotion}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-[#94a3b8] text-xs">{(avgConf * 100).toFixed(0)}%</td>
+                  <td className="px-3 py-2 text-slate-500 font-semibold text-xs">{(avgConf * 100).toFixed(0)}%</td>
                 </tr>
               );
             })}
@@ -165,7 +165,7 @@ export default function ConversationList({ groups, selectedId, onSelect, searchQ
         </table>
       </div>
       {filteredGroups.length > 50 && (
-        <div className="p-2 text-center text-xs text-[#94a3b8] border-t border-[#2a2d3a]">
+        <div className="p-2 text-center text-xs text-slate-400 font-medium border-t border-slate-100 bg-slate-50/30">
           Showing 50 of {filteredGroups.length} conversations
         </div>
       )}

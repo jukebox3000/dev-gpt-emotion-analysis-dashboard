@@ -6,9 +6,10 @@ export interface Turn {
   text: string;
   text_preview: string;
   emotion_raw: string | null;
-  emotion_dev: "Frustration" | "Confusion" | "Satisfaction" | "Engagement" | "Negativity" | "Neutral" | null;
+  emotion_dev: "Frustration" | "Confusion" | "Satisfaction" | "Engagement" | "Neutral" | null;
   emotion_confidence: number;
   sentiment_polarity: number;
+  sentiment_senti4sd?: "positive" | "neutral" | "negative" | null;
   prompt_intent: "question" | "command" | "clarification" | "code_request" | "debugging" | "other";
   prompt_complexity: "Low" | "Medium" | "High";
   word_count: number;
@@ -82,7 +83,7 @@ export interface SummaryStats {
   };
 }
 
-export type EmotionType = "Frustration" | "Confusion" | "Satisfaction" | "Engagement" | "Negativity" | "Neutral";
+export type EmotionType = "Frustration" | "Confusion" | "Satisfaction" | "Engagement" | "Neutral";
 export type SpeakerType = "Developer" | "GPT";
 export type ComplexityType = "Low" | "Medium" | "High";
 export type IntentType = "question" | "command" | "clarification" | "code_request" | "debugging" | "other";

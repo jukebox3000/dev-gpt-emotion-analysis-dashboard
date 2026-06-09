@@ -1,8 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import { useDashboardStore } from '@/lib/store';
 import { EMOTION_ORDER, EMOTION_COLORS, INTENT_ORDER, INTENT_LABELS } from '@/lib/colors';
 import type { EmotionType, SpeakerType, ComplexityType, IntentType } from '@/lib/types';
+
+const EMOTION_EMOJIS: Record<EmotionType, string> = {
+  Frustration: '🤬',
+  Confusion: '😕',
+  Neutral: '😐',
+  Engagement: '💡',
+  Satisfaction: '😊',
+};
 
 export default function Sidebar() {
   const {
@@ -21,39 +30,83 @@ export default function Sidebar() {
   const allComplexities: ComplexityType[] = ['Low', 'Medium', 'High'];
 
   return (
-    <div className="rounded-xl border border-[#2a2d3a] bg-[#1a1d27] p-4 space-y-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-[#e2e8f0]">Filters</h2>
-        <button
-          onClick={resetFilters}
-          className="text-xs text-[#94a3b8] hover:text-[#e2e8f0] transition-colors"
-        >
-          Reset All
-        </button>
+    <div className="rounded-2xl border border-indigo-100 bg-indigo-50/15 p-4 space-y-5 shadow-sm">
+      <div className="flex items-center justify-between border-b border-indigo-100/50 pb-2">
+        <h2 className="text-sm font-bold text-indigo-950 flex items-center gap-1.5">
+          <span>🎛️</span> Filters
+        </h2>
       </div>
 
-      {/* Emotion Filter */}
+      {/* Emotion Filter Tiles */}
       <div>
-        <h3 className="text-xs font-medium text-[#94a3b8] mb-2 uppercase tracking-wider">Emotion</h3>
-        <div className="space-y-1">
+        <h3 className="text-xs font-semibold text-indigo-900/50 mb-2.5 uppercase tracking-wider">Emotion</h3>
+
+        <div className="grid grid-cols-2 gap-2">
+          {/* Reset All / All tile */}
+          <button
+            onClick={resetFilters}
+            className={`col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border text-center transition-all cursor-pointer ${selectedEmotions.length === EMOTION_ORDER.length
+                ? 'bg-slate-900 border-slate-900 text-white shadow-md font-bold'
+                : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+              }`}
+          >
+            <span className="text-base">🎯</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Reset</span>
+          </button>
+
+          {/* Emotion Tiles */}
           {EMOTION_ORDER.map((emotion) => {
-            const isActive = selectedEmotions.includes(emotion);
+            const isAllActive = selectedEmotions.length === EMOTION_ORDER.length;
+            const isSelected = selectedEmotions.includes(emotion);
+            const baseColor = EMOTION_COLORS[emotion];
+
+            let style = {};
+            let textClass = '';
+            let emojiClass = '';
+
+            if (isAllActive) {
+              // State A: Active but not isolated (All selected)
+              style = {
+                backgroundColor: `${baseColor}24`, // 14% opacity bg
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: baseColor,
+              };
+              textClass = 'font-bold';
+            } else if (isSelected) {
+              // State B: Isolated Active (Saturated)
+              style = {
+                backgroundColor: baseColor,
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: '#ffffff',
+              };
+              textClass = 'text-white font-extrabold';
+            } else {
+              // State C: Filtered Out (More visible gray outline and text)
+              style = {
+                backgroundColor: '#ffffff',
+                borderColor: '#cbd5e1', // slate-300
+                borderWidth: '1px',
+                color: '#64748b', // slate-500
+              };
+              textClass = 'text-slate-500 font-medium';
+              emojiClass = 'opacity-45';
+            }
+
             return (
               <button
                 key={emotion}
                 onClick={() => toggleEmotion(emotion)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${
-                  isActive ? 'bg-[#2a2d3a] text-[#e2e8f0]' : 'text-[#64748b] hover:text-[#94a3b8]'
-                }`}
+                style={style}
+                className="flex flex-col items-center justify-center p-3 rounded-xl border transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
               >
-                <span
-                  className="w-3 h-3 rounded-sm shrink-0"
-                  style={{
-                    backgroundColor: isActive ? EMOTION_COLORS[emotion] : '#2a2d3a',
-                    opacity: isActive ? 1 : 0.5,
-                  }}
-                />
-                {emotion}
+                <span className={`text-2xl mb-1 filter drop-shadow-sm transition-all ${emojiClass}`}>
+                  {EMOTION_EMOJIS[emotion]}
+                </span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider transition-all ${textClass}`}>
+                  {emotion}
+                </span>
               </button>
             );
           })}
@@ -62,20 +115,56 @@ export default function Sidebar() {
 
       {/* Speaker Filter */}
       <div>
-        <h3 className="text-xs font-medium text-[#94a3b8] mb-2 uppercase tracking-wider">Speaker</h3>
-        <div className="space-y-1">
+        <h3 className="text-xs font-semibold text-indigo-900/50 mb-2.5 uppercase tracking-wider">Speaker</h3>
+        <div className="grid grid-cols-2 gap-2">
           {allSpeakers.map((speaker) => {
-            const isActive = selectedSpeakers.includes(speaker);
+            const isAllActive = selectedSpeakers.length === allSpeakers.length;
+            const isSelected = selectedSpeakers.includes(speaker);
+            const baseColor = speaker === 'Developer' ? '#3b82f6' : '#10b981';
+            const emoji = speaker === 'Developer' ? '👨‍💻' : '🤖';
+
+            let style = {};
+            let textClass = '';
+            let emojiClass = '';
+
+            if (isAllActive) {
+              style = {
+                backgroundColor: `${baseColor}24`, // 14% opacity bg
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: baseColor,
+              };
+              textClass = 'font-bold';
+            } else if (isSelected) {
+              style = {
+                backgroundColor: baseColor,
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: '#ffffff',
+              };
+              textClass = 'text-white font-extrabold';
+            } else {
+              style = {
+                backgroundColor: '#ffffff',
+                borderColor: '#cbd5e1', // slate-300
+                borderWidth: '1px',
+                color: '#64748b', // slate-500
+              };
+              textClass = 'text-slate-500 font-medium';
+              emojiClass = 'opacity-45';
+            }
+
             return (
               <button
                 key={speaker}
                 onClick={() => toggleSpeaker(speaker)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${
-                  isActive ? 'bg-[#2a2d3a] text-[#e2e8f0]' : 'text-[#64748b] hover:text-[#94a3b8]'
-                }`}
+                style={style}
+                className="flex flex-col items-center justify-center p-3 rounded-xl border transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
               >
-                <span className={`w-3 h-3 rounded-full shrink-0 ${speaker === 'Developer' ? 'bg-[#22c55e]' : 'bg-[#93c5fd]'}`} style={{ opacity: isActive ? 1 : 0.4 }} />
-                {speaker}
+                <span className={`text-2xl mb-1 filter drop-shadow-sm transition-all ${emojiClass}`}>{emoji}</span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider transition-all ${textClass}`}>
+                  {speaker}
+                </span>
               </button>
             );
           })}
@@ -84,19 +173,57 @@ export default function Sidebar() {
 
       {/* Complexity Filter */}
       <div>
-        <h3 className="text-xs font-medium text-[#94a3b8] mb-2 uppercase tracking-wider">Complexity</h3>
-        <div className="flex gap-1">
+        <h3 className="text-xs font-semibold text-indigo-900/50 mb-2 uppercase tracking-wider">Complexity</h3>
+        <div className="flex gap-2 items-end min-h-[60px] mt-1.5 border-b border-slate-100 pb-2">
           {allComplexities.map((complexity) => {
-            const isActive = selectedComplexities.includes(complexity);
+            const isAllActive = selectedComplexities.length === allComplexities.length;
+            const isSelected = selectedComplexities.includes(complexity);
+            const baseColor = '#3b82f6'; // Clean blue shade
+
+            const heightClass =
+              complexity === 'Low' ? 'h-8' :
+              complexity === 'Medium' ? 'h-11' :
+              'h-14';
+
+            let style = {};
+            let textClass = '';
+
+            if (isAllActive) {
+              style = {
+                backgroundColor: `${baseColor}24`, // 14% opacity bg
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: baseColor,
+              };
+              textClass = 'font-bold';
+            } else if (isSelected) {
+              style = {
+                backgroundColor: baseColor,
+                borderColor: baseColor,
+                borderWidth: '1.5px',
+                color: '#ffffff',
+              };
+              textClass = 'text-white font-extrabold';
+            } else {
+              style = {
+                backgroundColor: '#ffffff',
+                borderColor: '#cbd5e1', // slate-300
+                borderWidth: '1.5px',
+                color: '#64748b', // slate-500
+              };
+              textClass = 'text-slate-500 font-medium';
+            }
+
             return (
               <button
                 key={complexity}
                 onClick={() => toggleComplexity(complexity)}
-                className={`flex-1 px-2 py-1.5 rounded text-xs transition-all text-center ${
-                  isActive ? 'bg-[#2a2d3a] text-[#e2e8f0]' : 'text-[#64748b] hover:text-[#94a3b8]'
-                }`}
+                style={style}
+                className={`flex-1 flex flex-col items-center justify-center ${heightClass} rounded-t-md rounded-b-none border transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-sm text-center`}
               >
-                {complexity}
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider leading-none transition-all ${textClass}`}>
+                  {complexity === 'Medium' ? 'Med' : complexity}
+                </span>
               </button>
             );
           })}
@@ -105,39 +232,101 @@ export default function Sidebar() {
 
       {/* Intent Filter */}
       <div>
-        <h3 className="text-xs font-medium text-[#94a3b8] mb-2 uppercase tracking-wider">Intent</h3>
-        <div className="space-y-1">
+        <h3 className="text-xs font-semibold text-indigo-900/50 mb-2 uppercase tracking-wider">Intent</h3>
+        <div className="flex flex-col gap-1">
           {INTENT_ORDER.map((intent) => {
-            const isActive = selectedIntents.includes(intent);
+            const isAllActive = selectedIntents.length === INTENT_ORDER.length;
+            const isSelected = selectedIntents.includes(intent);
+            const baseColor = '#6366f1'; // Unified indigo base
+
+            const INTENT_EMOJIS: Record<IntentType, string> = {
+              question: '❓',
+              command: '⚙️',
+              debugging: '🪲',
+              code_request: '📝',
+              clarification: '💬',
+              other: '🔧',
+            };
+
+            let style = {};
+            let textClass = '';
+            let emojiClass = '';
+
+            if (isAllActive) {
+              style = {
+                backgroundColor: `${baseColor}15`, // very soft tint background
+                borderColor: 'transparent',
+                color: baseColor,
+              };
+              textClass = 'font-bold';
+            } else if (isSelected) {
+              style = {
+                backgroundColor: baseColor,
+                borderColor: baseColor,
+                color: '#ffffff',
+              };
+              textClass = 'text-white font-extrabold';
+            } else {
+              style = {
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+                color: '#64748b',
+              };
+              textClass = 'text-slate-500 font-medium hover:text-slate-800';
+              emojiClass = 'opacity-50';
+            }
+
             return (
               <button
                 key={intent}
                 onClick={() => toggleIntent(intent)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-all ${
-                  isActive ? 'bg-[#2a2d3a] text-[#e2e8f0]' : 'text-[#64748b] hover:text-[#94a3b8]'
-                }`}
+                style={style}
+                className="flex items-center gap-2.5 px-2.5 py-1 rounded-lg border border-transparent transition-all cursor-pointer w-full text-left hover:bg-slate-50"
               >
-                {INTENT_LABELS[intent]}
+                <span className={`text-sm transition-all ${emojiClass}`}>
+                  {INTENT_EMOJIS[intent]}
+                </span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider transition-all ${textClass}`}>
+                  {INTENT_LABELS[intent]}
+                </span>
               </button>
             );
           })}
+
+          {/* Reset Intent Button */}
+          <button
+            onClick={() => useDashboardStore.setState({ selectedIntents: INTENT_ORDER })}
+            className={`mt-2 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-center transition-all cursor-pointer w-full ${
+              selectedIntents.length === INTENT_ORDER.length
+                ? 'bg-slate-900 border-slate-900 text-white font-bold shadow-sm'
+                : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+            }`}
+          >
+            <span className="text-xs">🎯</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider">Reset Intent</span>
+          </button>
         </div>
       </div>
 
-      {/* Emotion Color Legend */}
-      <div>
-        <h3 className="text-xs font-medium text-[#94a3b8] mb-2 uppercase tracking-wider">Color Legend</h3>
-        <div className="space-y-1.5 text-[10px]">
-          <div className="text-[#94a3b8] font-medium">Speaker Distinction:</div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-3 rounded-sm bg-[#4b5563]" />
-            <span className="text-[#94a3b8]">Developer — saturated</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-3 rounded-sm bg-[#9ca3af]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(75,85,99,0.3) 2px, rgba(75,85,99,0.3) 4px)' }} />
-            <span className="text-[#94a3b8]">GPT — muted + stripes</span>
-          </div>
-        </div>
+      <div className="pt-3 border-t border-indigo-100/50 flex flex-col gap-1.5 items-center">
+        <Link
+          href="/emotxt-dashboard"
+          className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+        >
+          📊 EmoTxt Classifier Dashboard
+        </Link>
+        <Link
+          href="/prototype"
+          className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+        >
+          🔬 Raw Emotions Prototype
+        </Link>
+        <Link
+          href="/senti4sd-prototype"
+          className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors"
+        >
+          🛡️ Senti4SD Sentiment Prototype
+        </Link>
       </div>
     </div>
   );

@@ -88,7 +88,7 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
 
     g.append('path')
       .datum(devBins)
-      .attr('fill', '#22c55e')
+      .attr('fill', '#3b82f6')
       .attr('opacity', 0)
       .attr('d', devArea)
       .transition().duration(800).ease(d3.easeCubicInOut)
@@ -103,7 +103,7 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
 
     g.append('path')
       .datum(gptBins)
-      .attr('fill', '#93c5fd')
+      .attr('fill', '#10b981')
       .attr('opacity', 0)
       .attr('d', gptArea)
       .transition().duration(800).delay(100).ease(d3.easeCubicInOut)
@@ -118,14 +118,14 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
     g.append('path')
       .datum(devBins)
       .attr('fill', 'none')
-      .attr('stroke', '#22c55e')
+      .attr('stroke', '#3b82f6')
       .attr('stroke-width', 2)
       .attr('d', devLine)
       .attr('opacity', 0);
 
     // Animate line drawing
     const devLinePath = g.selectAll('path').filter(function () {
-      return d3.select(this).attr('stroke') === '#22c55e' && d3.select(this).attr('fill') === 'none';
+      return d3.select(this).attr('stroke') === '#3b82f6' && d3.select(this).attr('fill') === 'none';
     });
 
     const totalLength = (devLinePath.node() as SVGPathElement)?.getTotalLength() || 0;
@@ -147,13 +147,13 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
     g.append('path')
       .datum(gptBins)
       .attr('fill', 'none')
-      .attr('stroke', '#93c5fd')
+      .attr('stroke', '#10b981')
       .attr('stroke-width', 2)
       .attr('d', gptLine)
       .attr('opacity', 0);
 
     const gptLinePath = g.selectAll('path').filter(function () {
-      return d3.select(this).attr('stroke') === '#93c5fd' && d3.select(this).attr('fill') === 'none';
+      return d3.select(this).attr('stroke') === '#10b981' && d3.select(this).attr('fill') === 'none';
     });
 
     const gptLength = (gptLinePath.node() as SVGPathElement)?.getTotalLength() || 0;
@@ -168,13 +168,29 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
       .attr('stroke-dashoffset', 0);
 
     // Hover overlay
+    const hoverLine = g.append('line')
+      .attr('y1', 0)
+      .attr('y2', innerHeight)
+      .attr('stroke', '#64748b')
+      .attr('stroke-width', 1.0)
+      .attr('stroke-dasharray', '3,3')
+      .attr('opacity', 0)
+      .style('pointer-events', 'none');
+
     g.append('rect')
       .attr('width', innerWidth).attr('height', innerHeight)
       .attr('fill', 'transparent')
+      .style('cursor', 'crosshair')
       .on('mousemove', (event) => {
         const [mx] = d3.pointer(event);
         const polarity = x.invert(mx);
         const binIdx = Math.min(Math.max(Math.floor((polarity + 1) / binWidth), 0), bins - 1);
+        
+        hoverLine
+          .attr('x1', mx)
+          .attr('x2', mx)
+          .attr('opacity', 1);
+
         setGlobalTooltip({
           extraFields: {
             Polarity: polarity.toFixed(2),
@@ -183,13 +199,16 @@ export default function SentimentDistribution({ data, width, height }: Sentiment
           },
         });
       })
-      .on('mouseout', () => setGlobalTooltip(null));
+      .on('mouseout', () => {
+        hoverLine.attr('opacity', 0);
+        setGlobalTooltip(null);
+      });
 
     // Legend
     const legend = g.append('g').attr('transform', `translate(${innerWidth - 130}, -10)`);
-    legend.append('rect').attr('width', 12).attr('height', 12).attr('rx', 2).attr('fill', '#22c55e').attr('opacity', 0.7);
+    legend.append('rect').attr('width', 12).attr('height', 12).attr('rx', 2).attr('fill', '#3b82f6').attr('opacity', 0.7);
     legend.append('text').attr('x', 18).attr('y', 10).attr('fill', THEME.textSecondary).attr('font-size', '10px').text('Developer');
-    legend.append('rect').attr('width', 12).attr('height', 12).attr('y', 16).attr('rx', 2).attr('fill', '#93c5fd').attr('opacity', 0.7);
+    legend.append('rect').attr('width', 12).attr('height', 12).attr('y', 16).attr('rx', 2).attr('fill', '#10b981').attr('opacity', 0.7);
     legend.append('text').attr('x', 18).attr('y', 26).attr('fill', THEME.textSecondary).attr('font-size', '10px').text('GPT');
 
   }, [data, width, height]);

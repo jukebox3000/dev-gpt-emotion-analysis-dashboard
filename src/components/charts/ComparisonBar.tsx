@@ -1,8 +1,8 @@
 'use client';
-
+import { useDashboardStore } from '@/lib/store';
 import { useRef, useEffect, useCallback } from 'react';
 import * as d3 from 'd3';
-import { COMPLEXITY_ORDER, EMOTION_ORDER, EMOTION_COLORS, EMOTION_COLORS_DEV, THEME } from '@/lib/colors';
+import { COMPLEXITY_ORDER, EMOTION_ORDER, EMOTION_COLORS, EMOTION_COLORS_DEV, THEME, getEmotionGlow } from '@/lib/colors';
 import { setGlobalTooltip } from '@/components/shared/ChartTooltip';
 import type { Turn, EmotionType, ComplexityType } from '@/lib/types';
 
@@ -102,13 +102,25 @@ export default function ComplexityEmotionBar({ data, width, height }: Complexity
       activeEmotions.forEach(emotion => {
         const val = matrix[complexity][emotion];
         g.append('rect')
+          .attr('class', 'comp-bar')
           .attr('x', x0(complexity)! + x1(emotion as EmotionType)!)
           .attr('y', innerHeight)
           .attr('width', x1.bandwidth())
           .attr('height', 0)
           .attr('rx', 2)
           .attr('fill', EMOTION_COLORS_DEV[emotion as EmotionType] || EMOTION_COLORS[emotion as EmotionType])
-          .on('mouseover', () => {
+          .style('cursor', 'pointer')
+          .on('mouseover', (event) => {
+            const glowColor = getEmotionGlow(emotion as EmotionType);
+            g.selectAll('.comp-bar')
+              .transition().duration(300).style('opacity', 0.25);
+            d3.select(event.currentTarget)
+              .raise()
+              .transition().duration(300).ease(d3.easeCubicOut)
+              .style('opacity', 1)
+              .style('filter', `drop-shadow(0 0 6px ${glowColor})`)
+              .attr('stroke', 'none');
+
             const exampleTurn = data.find(t =>
               t.prompt_complexity === complexity &&
               (t.emotion_dev || 'Neutral') === emotion
@@ -120,10 +132,34 @@ export default function ComplexityEmotionBar({ data, width, height }: Complexity
               extraFields: {
                 Complexity: complexity,
               },
-              textSnippet: exampleTurn?.text_preview?.slice(0, 100),
+              textSnippet: exampleTurn?.text?.slice(0, 250),
             });
           })
-          .on('mouseout', () => setGlobalTooltip(null))
+          .on('mouseout', () => {
+            g.selectAll('.comp-bar')
+              .transition().duration(300).ease(d3.easeCubicOut)
+              .style('opacity', 1)
+              .style('filter', 'none')
+              .attr('stroke', 'none');
+            setGlobalTooltip(null);
+          })
+          .on('click', () => {
+            useDashboardStore.setState({
+              selectedEmotions: [emotion as EmotionType],
+              selectedComplexities: [complexity],
+              activeTab: 'case-inspector'
+            });
+            const matchingTurn = data.find(t => 
+              (t.emotion_dev || 'Neutral') === emotion && 
+              t.prompt_complexity === complexity
+            );
+            if (matchingTurn) {
+              useDashboardStore.setState({
+                selectedConversationId: matchingTurn.conversation_id,
+                highlightTurnId: matchingTurn.turn_id
+              });
+            }
+          })
           .transition()
           .duration(800)
           .ease(d3.easeCubicInOut)

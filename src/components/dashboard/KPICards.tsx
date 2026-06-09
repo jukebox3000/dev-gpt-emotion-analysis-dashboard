@@ -68,15 +68,15 @@ export default function KPICards({ totalConversations, frustrationRate, avgPromp
       {cards.map((card) => (
         <div
           key={card.title}
-          className="rounded-xl border border-[#2a2d3a] bg-[#1a1d27] p-4 hover:border-[#3a3d4a] transition-colors"
+          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02),0_10px_20px_rgba(0,0,0,0.015)] hover:border-slate-300 transition-all duration-300"
         >
-          <div className="text-xs text-[#94a3b8] font-medium uppercase tracking-wider mb-1">
+          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
             {card.title}
           </div>
-          <div className="text-2xl font-bold text-[#e2e8f0]">
+          <div className="text-3xl font-extrabold bg-gradient-to-r from-slate-800 to-indigo-950 bg-clip-text text-transparent">
             <AnimatedNumber value={card.value} formatter={card.formatter} />
           </div>
-          <div className="text-xs text-[#64748b] mt-1">{card.subtitle}</div>
+          <div className="text-xs text-slate-500 font-medium mt-1">{card.subtitle}</div>
         </div>
       ))}
     </div>

@@ -1,8 +1,8 @@
 'use client';
-
+import { useDashboardStore } from '@/lib/store';
 import { useRef, useEffect, useCallback } from 'react';
 import * as d3 from 'd3';
-import { EMOTION_ORDER, EMOTION_COLORS, EMOTION_COLORS_DEV, EMOTION_COLORS_GPT } from '@/lib/colors';
+import { EMOTION_ORDER, EMOTION_COLORS, EMOTION_COLORS_DEV, EMOTION_COLORS_GPT, getEmotionGlow } from '@/lib/colors';
 import { setGlobalTooltip } from '@/components/shared/ChartTooltip';
 import type { Turn, EmotionType } from '@/lib/types';
 
@@ -66,9 +66,17 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
       .innerRadius(innerRadiusDev)
       .outerRadius(outerRadiusDev);
 
+    const arcDevHover = d3.arc<d3.PieArcDatum<{ emotion: string; count: number }>>()
+      .innerRadius(innerRadiusDev - 2)
+      .outerRadius(outerRadiusDev + 10);
+
     const arcGpt = d3.arc<d3.PieArcDatum<{ emotion: string; count: number }>>()
       .innerRadius(innerRadiusGpt)
       .outerRadius(outerRadiusGpt);
+
+    const arcGptHover = d3.arc<d3.PieArcDatum<{ emotion: string; count: number }>>()
+      .innerRadius(innerRadiusGpt - 2)
+      .outerRadius(outerRadiusGpt + 10);
 
     // GPT arcs (outer)
     const gptArcs = g.append('g').selectAll('path')
@@ -77,10 +85,21 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
       .append('path')
       .attr('d', arcGpt as any)
       .attr('fill', d => `url(#pattern-gpt-${d.data.emotion.toLowerCase()})`)
-      .attr('stroke', '#1a1d27')
-      .attr('stroke-width', 1)
+      .attr('stroke', '#ffffff')
+      .attr('stroke-width', 1.5)
       .style('opacity', 0)
+      .style('filter', 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.65))')
+      .style('cursor', 'pointer')
       .on('mouseover', (event, d) => {
+        const glowColor = getEmotionGlow(d.data.emotion as EmotionType);
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(300)
+          .ease(d3.easeCubicOut)
+          .attr('d', arcGptHover as any)
+          .attr('stroke-width', 2)
+          .style('filter', `drop-shadow(0 0 7px ${glowColor})`);
+
         const pct = ((d.data.count / totalGpt) * 100).toFixed(1);
         const exampleTurn = gptTurns.find(t => (t.emotion_dev || 'Neutral') === d.data.emotion);
         setGlobalTooltip({
@@ -89,10 +108,32 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
           speaker: 'GPT',
           count: d.data.count,
           percentage: `${pct}%`,
-          textSnippet: exampleTurn?.text_preview?.slice(0, 100),
+          textSnippet: exampleTurn?.text?.slice(0, 250),
         });
       })
-      .on('mouseout', () => setGlobalTooltip(null));
+      .on('mouseout', (event) => {
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(300)
+          .ease(d3.easeCubicOut)
+          .attr('d', arcGpt as any)
+          .attr('stroke-width', 1.5)
+          .style('filter', 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.65))');
+        setGlobalTooltip(null);
+      })
+      .on('click', (event, d) => {
+        useDashboardStore.setState({
+          selectedEmotions: [d.data.emotion as EmotionType],
+          activeTab: 'case-inspector'
+        });
+        const matchingTurn = data.find(t => (t.emotion_dev || 'Neutral') === d.data.emotion && t.speaker === 'GPT');
+        if (matchingTurn) {
+          useDashboardStore.setState({
+            selectedConversationId: matchingTurn.conversation_id,
+            highlightTurnId: matchingTurn.turn_id
+          });
+        }
+      });
 
     gptArcs.transition()
       .duration(800)
@@ -106,10 +147,21 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
       .append('path')
       .attr('d', arcDev as any)
       .attr('fill', d => EMOTION_COLORS_DEV[d.data.emotion as EmotionType] || EMOTION_COLORS[d.data.emotion as EmotionType])
-      .attr('stroke', '#1a1d27')
-      .attr('stroke-width', 1)
+      .attr('stroke', '#ffffff')
+      .attr('stroke-width', 1.5)
       .style('opacity', 0)
+      .style('filter', 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.65))')
+      .style('cursor', 'pointer')
       .on('mouseover', (event, d) => {
+        const glowColor = getEmotionGlow(d.data.emotion as EmotionType);
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(300)
+          .ease(d3.easeCubicOut)
+          .attr('d', arcDevHover as any)
+          .attr('stroke-width', 2)
+          .style('filter', `drop-shadow(0 0 8px ${glowColor})`);
+
         const pct = ((d.data.count / totalDev) * 100).toFixed(1);
         const exampleTurn = devTurns.find(t => (t.emotion_dev || 'Neutral') === d.data.emotion);
         setGlobalTooltip({
@@ -118,10 +170,32 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
           speaker: 'Developer',
           count: d.data.count,
           percentage: `${pct}%`,
-          textSnippet: exampleTurn?.text_preview?.slice(0, 100),
+          textSnippet: exampleTurn?.text?.slice(0, 250),
         });
       })
-      .on('mouseout', () => setGlobalTooltip(null));
+      .on('mouseout', (event) => {
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(300)
+          .ease(d3.easeCubicOut)
+          .attr('d', arcDev as any)
+          .attr('stroke-width', 1.5)
+          .style('filter', 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.65))');
+        setGlobalTooltip(null);
+      })
+      .on('click', (event, d) => {
+        useDashboardStore.setState({
+          selectedEmotions: [d.data.emotion as EmotionType],
+          activeTab: 'case-inspector'
+        });
+        const matchingTurn = data.find(t => (t.emotion_dev || 'Neutral') === d.data.emotion && t.speaker === 'Developer');
+        if (matchingTurn) {
+          useDashboardStore.setState({
+            selectedConversationId: matchingTurn.conversation_id,
+            highlightTurnId: matchingTurn.turn_id
+          });
+        }
+      });
 
     devArcs.transition()
       .duration(800)
@@ -133,7 +207,7 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
     g.append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', '-0.3em')
-      .attr('fill', '#e2e8f0')
+      .attr('fill', '#0f172a')
       .attr('font-size', '18px')
       .attr('font-weight', 'bold')
       .text(totalAll.toLocaleString());
@@ -141,7 +215,7 @@ export default function EmotionDonut({ data, width, height }: EmotionDonutProps)
     g.append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', '1.2em')
-      .attr('fill', '#94a3b8')
+      .attr('fill', '#64748b')
       .attr('font-size', '11px')
       .text('turns');
 

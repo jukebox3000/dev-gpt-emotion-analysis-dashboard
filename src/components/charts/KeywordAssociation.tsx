@@ -109,13 +109,26 @@ export default function KeywordAssociation({ data, width, height }: KeywordAssoc
       EMOTION_ORDER.forEach(emotion => {
         if (d.emotions[emotion] > 0) {
           g.append('rect')
+            .attr('class', 'kw-bar')
             .attr('x', x(currentX))
             .attr('y', y(d.keyword)!)
             .attr('width', 0)
             .attr('height', y.bandwidth())
             .attr('fill', EMOTION_COLORS[emotion as EmotionType])
             .attr('rx', 1)
-            .on('mouseover', () => {
+            .style('cursor', 'pointer')
+            .on('mouseover', (event) => {
+              g.selectAll('.kw-bar')
+                .transition()
+                .duration(150)
+                .style('opacity', 0.3);
+              d3.select(event.currentTarget)
+                .transition()
+                .duration(150)
+                .style('opacity', 1)
+                .attr('stroke', '#0f172a')
+                .attr('stroke-width', 1.2);
+
               setGlobalTooltip({
                 emotion,
                 emotionColor: EMOTION_COLORS[emotion as EmotionType],
@@ -123,7 +136,14 @@ export default function KeywordAssociation({ data, width, height }: KeywordAssoc
                 extraFields: { Keyword: d.keyword },
               });
             })
-            .on('mouseout', () => setGlobalTooltip(null))
+            .on('mouseout', (event) => {
+              g.selectAll('.kw-bar')
+                .transition()
+                .duration(150)
+                .style('opacity', 1)
+                .attr('stroke', 'none');
+              setGlobalTooltip(null);
+            })
             .transition().duration(800).ease(d3.easeCubicInOut)
             .attr('x', x(currentX))
             .attr('width', x(d.emotions[emotion]));

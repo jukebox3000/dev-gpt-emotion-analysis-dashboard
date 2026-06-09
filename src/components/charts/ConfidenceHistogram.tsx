@@ -79,21 +79,41 @@ export default function ConfidenceHistogram({ data, width, height }: ConfidenceH
     // Developer bars
     devBins.forEach(d => {
       g.append('rect')
+        .attr('class', 'hist-rect')
         .attr('x', x(d.bin))
         .attr('y', innerHeight)
         .attr('width', barW)
         .attr('height', 0)
-        .attr('fill', '#22c55e')
+        .attr('fill', '#3b82f6')
         .attr('opacity', 0.7)
         .attr('rx', 1)
-        .on('mouseover', () => {
+        .style('cursor', 'pointer')
+        .on('mouseover', (event) => {
+          g.selectAll('.hist-rect')
+            .transition()
+            .duration(150)
+            .style('opacity', 0.25);
+          d3.select(event.currentTarget)
+            .transition()
+            .duration(150)
+            .style('opacity', 1)
+            .attr('stroke', '#0f172a')
+            .attr('stroke-width', 1.2);
+
           setGlobalTooltip({
             speaker: 'Developer',
             count: d.count,
             extraFields: { 'Confidence Range': `${d.bin.toFixed(2)}–${(d.bin + binWidth).toFixed(2)}` },
           });
         })
-        .on('mouseout', () => setGlobalTooltip(null))
+        .on('mouseout', (event) => {
+          g.selectAll('.hist-rect')
+            .transition()
+            .duration(150)
+            .style('opacity', 0.7)
+            .attr('stroke', 'none');
+          setGlobalTooltip(null);
+        })
         .transition().duration(800).ease(d3.easeCubicInOut)
         .attr('y', y(d.count))
         .attr('height', innerHeight - y(d.count));
@@ -102,21 +122,41 @@ export default function ConfidenceHistogram({ data, width, height }: ConfidenceH
     // GPT bars
     gptBins.forEach(d => {
       g.append('rect')
+        .attr('class', 'hist-rect')
         .attr('x', x(d.bin) + barW)
         .attr('y', innerHeight)
         .attr('width', barW)
         .attr('height', 0)
-        .attr('fill', '#93c5fd')
+        .attr('fill', '#10b981')
         .attr('opacity', 0.7)
         .attr('rx', 1)
-        .on('mouseover', () => {
+        .style('cursor', 'pointer')
+        .on('mouseover', (event) => {
+          g.selectAll('.hist-rect')
+            .transition()
+            .duration(150)
+            .style('opacity', 0.25);
+          d3.select(event.currentTarget)
+            .transition()
+            .duration(150)
+            .style('opacity', 1)
+            .attr('stroke', '#0f172a')
+            .attr('stroke-width', 1.2);
+
           setGlobalTooltip({
             speaker: 'GPT',
             count: d.count,
             extraFields: { 'Confidence Range': `${d.bin.toFixed(2)}–${(d.bin + binWidth).toFixed(2)}` },
           });
         })
-        .on('mouseout', () => setGlobalTooltip(null))
+        .on('mouseout', (event) => {
+          g.selectAll('.hist-rect')
+            .transition()
+            .duration(150)
+            .style('opacity', 0.7)
+            .attr('stroke', 'none');
+          setGlobalTooltip(null);
+        })
         .transition().duration(800).delay(100).ease(d3.easeCubicInOut)
         .attr('y', y(d.count))
         .attr('height', innerHeight - y(d.count));
@@ -124,9 +164,9 @@ export default function ConfidenceHistogram({ data, width, height }: ConfidenceH
 
     // Legend
     const legend = g.append('g').attr('transform', `translate(${innerWidth - 130}, -10)`);
-    legend.append('rect').attr('width', 12).attr('height', 12).attr('rx', 2).attr('fill', '#22c55e').attr('opacity', 0.7);
+    legend.append('rect').attr('width', 12).attr('height', 12).attr('rx', 2).attr('fill', '#3b82f6').attr('opacity', 0.7);
     legend.append('text').attr('x', 18).attr('y', 10).attr('fill', THEME.textSecondary).attr('font-size', '10px').text('Developer');
-    legend.append('rect').attr('width', 12).attr('height', 12).attr('y', 16).attr('rx', 2).attr('fill', '#93c5fd').attr('opacity', 0.7);
+    legend.append('rect').attr('width', 12).attr('height', 12).attr('y', 16).attr('rx', 2).attr('fill', '#10b981').attr('opacity', 0.7);
     legend.append('text').attr('x', 18).attr('y', 26).attr('fill', THEME.textSecondary).attr('font-size', '10px').text('GPT');
 
   }, [data, width, height]);

@@ -97,7 +97,15 @@ export default function ScatterPlot({ data, width, height, onPointClick }: Scatt
       .attr('stroke', 'none')
       .attr('cursor', 'pointer')
       .on('mouseover', function (event, d) {
-        d3.select(this).attr('opacity', 1).attr('stroke', '#fff').attr('stroke-width', 2);
+        d3.select(this)
+          .raise()
+          .transition()
+          .duration(150)
+          .attr('r', 8)
+          .attr('opacity', 1)
+          .attr('stroke', '#0f172a')
+          .attr('stroke-width', 1.5);
+
         const emotion = d.emotion_dev || 'Neutral';
         setGlobalTooltip({
           emotion,
@@ -109,12 +117,17 @@ export default function ScatterPlot({ data, width, height, onPointClick }: Scatt
             Polarity: d.sentiment_polarity.toFixed(3),
             'Word Count': d.word_count,
           },
-          textSnippet: d.text_preview?.slice(0, 100),
+          textSnippet: d.text?.slice(0, 250),
           keywords: d.top_keywords?.slice(0, 5),
         });
       })
       .on('mouseout', function () {
-        d3.select(this).attr('opacity', 0.6).attr('stroke', 'none');
+        d3.select(this)
+          .transition()
+          .duration(150)
+          .attr('r', 4)
+          .attr('opacity', 0.6)
+          .attr('stroke', 'none');
         setGlobalTooltip(null);
       })
       .on('click', (event, d) => {

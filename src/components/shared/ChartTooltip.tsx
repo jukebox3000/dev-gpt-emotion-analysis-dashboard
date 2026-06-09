@@ -25,7 +25,7 @@ export default function ChartTooltip({ data }: ChartTooltipProps) {
   return (
     <div
       ref={tooltipRef}
-      className="pointer-events-none fixed z-[9999] rounded-lg border border-[#2a2d3a] bg-[#1a1d27]/95 px-3 py-2 shadow-xl backdrop-blur-sm"
+      className="pointer-events-none fixed z-[9999] rounded-lg border border-[#224369] bg-[#0f1f33]/95 px-3 py-2 shadow-xl backdrop-blur-sm"
       style={{ left: pos.x, top: pos.y, maxWidth: 320 }}
     >
       <div className="flex items-center gap-2 mb-1">
@@ -59,7 +59,7 @@ export default function ChartTooltip({ data }: ChartTooltipProps) {
         </div>
       )}
       {data.textSnippet && (
-        <div className="text-xs text-[#94a3b8] mt-1 line-clamp-2 italic">
+        <div className="text-xs text-[#94a3b8] mt-1.5 line-clamp-5 italic border-t border-[#224369]/30 pt-1.5 leading-relaxed">
           &ldquo;{data.textSnippet}&rdquo;
         </div>
       )}

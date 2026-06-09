@@ -1,0 +1,25 @@
+{
+  "overview": {
+    "total_turns": 1804,
+    "total_conversations": 164,
+    "developer_turns": 902,
+    "gpt_turns": 902
+  },
+  "sentiment_distribution": {
+    "overall": {
+      "positive": 632,
+      "neutral": 992,
+      "negative": 180
+    },
+    "developer": {
+      "positive": 220,
+      "neutral": 600,
+      "negative": 82
+    },
+    "gpt": {
+      "positive": 412,
+      "neutral": 392,
+      "negative": 98
+    }
+  }
+}

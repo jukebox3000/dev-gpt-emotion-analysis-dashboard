@@ -67,13 +67,25 @@ export default function MultiScatter({ turns, groups, width, height }: MultiScat
 
     if (convData.length === 0) return;
 
-    const xMax = d3.max(convData, d => d.devWords) || 1;
-    const yMax = d3.max(convData, d => d.gptWords) || 1;
+    // IQR-based outlier capping — cap axes at 95th percentile to prevent extreme points bloating the chart
+    const devWordsSorted = convData.map(d => d.devWords).sort(d3.ascending);
+    const gptWordsSorted = convData.map(d => d.gptWords).sort(d3.ascending);
+    const xCap = d3.quantile(devWordsSorted, 0.95) ?? d3.max(convData, d => d.devWords) ?? 1;
+    const yCap = d3.quantile(gptWordsSorted, 0.95) ?? d3.max(convData, d => d.gptWords) ?? 1;
+
+    // Clamp each point to the cap so outliers appear pressed against the edge rather than excluded
+    const clampedData = convData.map(d => ({
+      ...d,
+      devWordsClamped: Math.min(d.devWords, xCap),
+      gptWordsClamped: Math.min(d.gptWords, yCap),
+      isOutlier: d.devWords > xCap || d.gptWords > yCap,
+    }));
+
     const sizeMax = d3.max(convData, d => d.codeBlocks) || 1;
 
-    const x = d3.scaleLinear().domain([0, xMax * 1.05]).range([0, innerWidth]);
-    const y = d3.scaleLinear().domain([0, yMax * 1.05]).range([innerHeight, 0]);
-    const size = d3.scaleSqrt().domain([0, sizeMax]).range([3, 16]);
+    const x = d3.scaleLinear().domain([0, xCap * 1.03]).range([0, innerWidth]);
+    const y = d3.scaleLinear().domain([0, yCap * 1.03]).range([innerHeight, 0]);
+    const size = d3.scaleSqrt().domain([0, sizeMax]).range([3, 14]);
 
     // Grid
     g.append('g').selectAll('line').data(x.ticks(5)).enter()
@@ -101,33 +113,56 @@ export default function MultiScatter({ turns, groups, width, height }: MultiScat
       .attr('text-anchor', 'middle').attr('fill', THEME.textSecondary).attr('font-size', '11px')
       .text('GPT Avg. Word Count');
 
-    // Points
+    // Points — outliers shown with dashed stroke so they're identifiable
     g.selectAll('circle')
-      .data(convData)
+      .data(clampedData)
       .enter()
       .append('circle')
-      .attr('cx', d => x(d.devWords))
-      .attr('cy', d => y(d.gptWords))
+      .attr('cx', d => x(d.devWordsClamped))
+      .attr('cy', d => y(d.gptWordsClamped))
       .attr('r', 0)
       .attr('fill', d => EMOTION_COLORS_DEV[d.devEmotion as EmotionType] || EMOTION_COLORS[d.devEmotion as EmotionType] || '#6b7280')
-      .attr('opacity', 0.7)
-      .attr('stroke', '#0f1117')
-      .attr('stroke-width', 0.5)
-      .on('mouseover', (event, d) => {
+      .attr('opacity', d => d.isOutlier ? 0.4 : 0.72)
+      .attr('stroke', d => d.isOutlier ? '#94a3b8' : '#ffffff')
+      .attr('stroke-width', d => d.isOutlier ? 1.5 : 0.75)
+      .attr('stroke-dasharray', d => d.isOutlier ? '2,2' : 'none')
+      .style('cursor', 'pointer')
+      .on('mouseover', function (event, d) {
+        d3.select(this)
+          .raise()
+          .transition()
+          .duration(150)
+          .attr('r', size(d.codeBlocks) + 4)
+          .attr('opacity', 1)
+          .attr('stroke', '#0f172a')
+          .attr('stroke-width', 1.5)
+          .attr('stroke-dasharray', 'none');
+
         setGlobalTooltip({
           emotion: d.devEmotion,
           emotionColor: EMOTION_COLORS[d.devEmotion as EmotionType],
           count: d.codeBlocks,
           extraFields: {
-            'Dev Words': Math.round(d.devWords),
-            'GPT Words': Math.round(d.gptWords),
+            'Dev Words (avg)': Math.round(d.devWords),
+            'GPT Words (avg)': Math.round(d.gptWords),
             'Code Blocks': d.codeBlocks,
+            ...(d.isOutlier ? { '⚠️ Outlier': 'clamped to axis edge' } : {}),
           },
           textSnippet: d.title,
           keywords: d.keywords,
         });
       })
-      .on('mouseout', () => setGlobalTooltip(null))
+      .on('mouseout', function (event, d) {
+        d3.select(this)
+          .transition()
+          .duration(150)
+          .attr('r', size(d.codeBlocks))
+          .attr('opacity', d.isOutlier ? 0.4 : 0.72)
+          .attr('stroke', d.isOutlier ? '#94a3b8' : '#ffffff')
+          .attr('stroke-width', d.isOutlier ? 1.5 : 0.75)
+          .attr('stroke-dasharray', d.isOutlier ? '2,2' : 'none');
+        setGlobalTooltip(null);
+      })
       .transition()
       .duration(1000)
       .ease(d3.easeCubicInOut)
@@ -158,5 +193,5 @@ export default function MultiScatter({ turns, groups, width, height }: MultiScat
 
   useEffect(() => { drawChart(); }, [drawChart]);
 
-  return <svg ref={svgRef} />;
+  return <svg ref={svgRef} className="w-full h-full" />;
 }
