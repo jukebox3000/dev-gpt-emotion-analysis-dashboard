@@ -43,7 +43,6 @@ An interactive, premium web application built with **Next.js 16**, **TypeScript*
 * **State Management**: Zustand
 * **Visualizations**: D3.js (v7.9.0)
 * **UI Components**: Shadcn UI & Framer Motion for elegant micro-animations
-* **Database / ORM**: Prisma
 
 ---
 
@@ -62,8 +61,7 @@ nextjs-emotion-dashboard/
 │   ├── hooks/               # Custom hooks (e.g., data loading)
 │   └── lib/                 # Store, color utils, types, data loaders
 ├── scripts/                 # GoEmotions classifier & pipeline scripts
-├── public/data/             # Preprocessed JSON datasets
-└── prisma/                  # Prisma Database schema definitions
+└── public/data/             # Preprocessed JSON datasets
 ```
 
 ---
@@ -105,9 +103,4 @@ npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-### 4. Database Setup (Optional)
-If database features are required, generate the client and push the schema:
-```bash
-bun run db:generate
-bun run db:push
-```
+
